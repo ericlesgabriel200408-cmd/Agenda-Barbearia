@@ -4,16 +4,16 @@
 
 /* --- VARIÁVEIS DE CORES E PALETA DE DESIGN --- */
 :root {
-  --bg-primary: #0f172a;     /* Cor de fundo principal */
-  --bg-card: #1e293b;        /* Cor dos cartões e painéis */
+  --bg-primary: #0f172a;     /* Cor de fundo principal do site */
+  --bg-card: #1e293b;        /* Cor de fundo dos cartões e painéis */
   --bg-hover: #334155;       /* Cor de destaque ao passar o mouse */
-  --accent: #3b82f6;         /* Cor primária de botões e destaques */
+  --accent: #3b82f6;         /* Cor primária de botões e destaques (Azul) */
   --accent-hover: #2563eb;   /* Cor de hover para botões primários */
-  --text-primary: #f8fafc;   /* Cor do texto principal */
-  --text-muted: #94a3b8;     /* Cor de textos secundários / legenda */
+  --text-primary: #f8fafc;   /* Cor do texto principal (Branco/Claro) */
+  --text-muted: #94a3b8;     /* Cor de textos secundários / legendas */
   --border-color: #334155;   /* Cor das bordas e divisores */
-  --danger: #ef4444;         /* Cor para botões de exclusão e alertas de erro */
-  --success: #22c55e;        /* Cor para confirmações de sucesso */
+  --danger: #ef4444;         /* Cor para botões de exclusão e alertas (Vermelho) */
+  --success: #22c55e;        /* Cor para confirmações de sucesso (Verde) */
   --whatsapp: #25D366;       /* Cor oficial da marca do WhatsApp */
 }
 
@@ -146,7 +146,7 @@ header h1 {
   text-decoration: underline; 
 }
 
-/* --- CARTOES E FORMULÁRIOS --- */
+/* --- CARTÕES E FORMULÁRIOS --- */
 .main-content { 
   display: grid; 
   grid-template-columns: 1fr; 
@@ -186,6 +186,7 @@ header h1 {
 }
 
 /* --- ÍCONE DE CALENDÁRIO DO INPUT DATE (AUMENTADO E DESTACADO) --- */
+/* Deixa o ícone de calendário nativo visível, nítido e com bom tamanho no tema escuro */
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   border-radius: 4px;
@@ -246,7 +247,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   cursor: pointer; 
 }
 
-/* --- LISTAS E STATUS --- */
+/* --- LISTAS E MENSAGENS DE STATUS --- */
 .appointment-item { 
   display: flex; 
   justify-content: space-between; 
@@ -275,4 +276,3 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .text-muted { color: var(--text-muted); }
-.text-danger { color: var(--danger); }
