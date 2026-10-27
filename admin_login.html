@@ -3,38 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - Painel Admin</title>
-  <!-- Arquivo de Estilização Principal -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- ARQUIVO DE ESTILIZAÇÃO PRINCIPAL -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body style="align-items: center; min-height: 80vh;">
+  
   <!-- FORMULÁRIO CENTRALIZADO DE AUTENTICAÇÃO DO ADMINISTRADOR -->
   <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
     <h2>Painel Administrativo 🔒</h2>
     <p class="text-muted" style="margin-bottom: 20px;">Digite a senha para gerenciar a agenda</p>
 
-    <!-- Campo de Entrada de Senha -->
+    <!-- Campo de Entrada de Senha (Senha padrão: admin) -->
     <div class="form-group">
       <input type="password" id="admin-pass" placeholder="Senha do Administrador">
     </div>
     
     <button id="btn-login" class="btn-submit">Acessar Painel</button>
-    <a href="/" class="btn-link" style="display: block; margin-top: 15px;">← Voltar ao site</a>
+    <a href="index.html" class="btn-link" style="display: block; margin-top: 15px;">← Voltar ao site</a>
   </div>
 
-  <!-- SCRIPT DE ENVIO DE CREDENCIAIS DE LOGIN -->
+  <!-- SCRIPT DE VALIDAÇÃO DE SENHA -->
   <script>
-    document.getElementById('btn-login').addEventListener('click', async () => {
+    document.getElementById('btn-login').addEventListener('click', () => {
       const password = document.getElementById('admin-pass').value;
-      const res = await fetch('/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-
-      if (res.ok) {
-        window.location.reload();
+      
+      // Senha padrão do painel (Pode alterar aqui se desejar)
+      if (password === 'admin') {
+        localStorage.setItem('is_admin', 'true');
+        window.location.href = 'admin.html';
       } else {
-        alert('Senha incorreta!');
+        alert('Senha incorreta! (A senha padrão é: admin)');
       }
     });
   </script>
