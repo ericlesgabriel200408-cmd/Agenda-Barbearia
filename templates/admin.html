@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Controle - Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header class="top-bar">
+      <h1>Painel de Gerenciamento</h1>
+      <div>
+        <a href="/" class="btn-small">Ver Site</a>
+        <button id="btn-logout" class="btn-small btn-danger">Sair</button>
+      </div>
+    </header>
+
+    <div class="main-content" style="grid-template-columns: 1fr 1fr;">
+      <!-- Gerenciar Agendamentos -->
+      <section class="card">
+        <h2>Agendamentos Confirmados</h2>
+        <div id="appointments-container">
+          {% if not appointments %}
+            <p class="text-muted">Nenhum agendamento realizado até o momento.</p>
+          {% else %}
+            {% for app in appointments %}
+              <div class="appointment-item">
+                <div>
+                  <strong>{{ app.service }}</strong> - {{ app.price }}<br>
+                  <small>📅 {{ app.date }} às {{ app.time }}</small><br>
+                  <small>👤 {{ app.client_name }} ({{ app.client_phone }})</small>
+                </div>
+                <button class="btn-danger btn-small" onclick="cancelApp('{{ app.id }}')">Cancelar</button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Bloquear Horários -->
+      <section class="card">
+        <h2>Fechar / Bloquear Horário</h2>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="block-date">
+        </div>
+        <div class="form-group">
+          <label>Horário</label>
+          <input type="time" id="block-time" step="1800">
+        </div>
+        <button id="btn-block" class="btn-submit">Bloquear / Liberar Horário</button>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      await fetch('/admin/logout', { method: 'POST' });
+      window.location.reload();
+    });
+
+    async function cancelApp(id) {
+      if (!confirm('Deseja cancelar este agendamento?')) return;
+
+      const res = await fetch('/admin/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+
+      if (res.ok) window.location.reload();
+    }
+
+    document.getElementById('btn-block').addEventListener('click', async () => {
+      const date = document.getElementById('block-date').value;
+      const time = document.getElementById('block-time').value;
+
+      if (!date || !time) {
+        alert('Selecione a data e o horário.');
+        return;
+      }
+
+      const res = await fetch('/admin/toggle-block', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, time })
+      });
+
+      if (res.ok) {
+        alert('Status do horário alterado com sucesso!');
+        window.location.reload();
+      }
+    });
+  </script>
+</body>
+</html>
