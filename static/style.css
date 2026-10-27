@@ -1,51 +1,278 @@
+/* ==============================================================================
+   ESTILOS CSS GLOBAIS DA APLICAÇÃO - TEMA ESCURO
+   ============================================================================== */
+
+/* --- VARIÁVEIS DE CORES E PALETA DE DESIGN --- */
 :root {
-  --bg-primary: #0f172a;
-  --bg-card: #1e293b;
-  --bg-hover: #334155;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --text-primary: #f8fafc;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-  --danger: #ef4444;
-  --success: #22c55e;
+  --bg-primary: #0f172a;     /* Cor de fundo principal */
+  --bg-card: #1e293b;        /* Cor dos cartões e painéis */
+  --bg-hover: #334155;       /* Cor de destaque ao passar o mouse */
+  --accent: #3b82f6;         /* Cor primária de botões e destaques */
+  --accent-hover: #2563eb;   /* Cor de hover para botões primários */
+  --text-primary: #f8fafc;   /* Cor do texto principal */
+  --text-muted: #94a3b8;     /* Cor de textos secundários / legenda */
+  --border-color: #334155;   /* Cor das bordas e divisores */
+  --danger: #ef4444;         /* Cor para botões de exclusão e alertas de erro */
+  --success: #22c55e;        /* Cor para confirmações de sucesso */
+  --whatsapp: #25D366;       /* Cor oficial da marca do WhatsApp */
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-body { background-color: var(--bg-primary); color: var(--text-primary); padding: 20px; display: flex; justify-content: center; }
-.container { width: 100%; max-width: 900px; }
+/* --- RESET BÁSICO E TIPOGRAFIA --- */
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+  font-family: system-ui, -apple-system, sans-serif; 
+}
 
-.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-header h1 { font-size: 1.8rem; color: var(--accent); }
+body { 
+  background-color: var(--bg-primary); 
+  color: var(--text-primary); 
+  padding: 20px; 
+  display: flex; 
+  justify-content: center; 
+}
 
-.user-bar { background-color: #1a2332; margin-bottom: 20px; padding: 15px; }
-.user-fields { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.user-fields input { padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: white; }
+.container { 
+  width: 100%; 
+  max-width: 900px; 
+}
 
-.btn-small { padding: 6px 12px; background: var(--accent); border: none; color: white; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
-.btn-danger { background: var(--danger); }
-.btn-link { background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; }
-.btn-admin-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
+/* --- CABEÇALHO E BARRA SUPERIOR --- */
+.top-bar { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 10px; 
+}
 
-.main-content { display: grid; grid-template-columns: 1fr; gap: 20px; }
-.card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
-.card h2 { margin-bottom: 15px; font-size: 1.2rem; }
+header { 
+  margin-bottom: 20px; 
+  padding-bottom: 15px; 
+  border-bottom: 1px solid var(--border-color); 
+}
 
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; }
-.form-group input, .form-group select { width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: white; }
+header h1 { 
+  font-size: 1.8rem; 
+  color: var(--accent); 
+}
 
-.slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-.slot-btn { padding: 10px 5px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: white; cursor: pointer; text-align: center; font-size: 0.85rem; }
-.slot-btn:hover:not(.disabled) { border-color: var(--accent); background: var(--bg-hover); }
-.slot-btn.selected { background: var(--accent); border-color: var(--accent); }
-.slot-btn.disabled { opacity: 0.4; cursor: not-allowed; background: #111; border-color: #222; }
+/* --- BOTÃO ESTILIZADO DA ÁREA ADMIN --- */
+.btn-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
 
-.btn-submit { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-.appointment-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 10px 0; }
-.status-message { padding: 10px; border-radius: 6px; margin-bottom: 15px; display: none; }
-.status-message.error { background: rgba(239, 68, 68, 0.2); color: var(--danger); display: block; }
-.status-message.success { background: rgba(34, 197, 94, 0.2); color: var(--success); display: block; }
+.btn-admin:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* --- LINKS E ÍCONES INTEGRADOS DO WHATSAPP --- */
+/* Altera a formatação visual e link de redirecionamento para o WhatsApp */
+.whatsapp-link {
+  color: var(--whatsapp);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.whatsapp-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+.wa-icon {
+  vertical-align: middle;
+}
+
+/* --- SESSÃO DE LOGIN/IDENTIFICAÇÃO RÁPIDA DO CLIENTE --- */
+.user-bar { 
+  background-color: #1a2332; 
+  margin-bottom: 20px; 
+  padding: 15px; 
+}
+
+.user-fields { 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  flex-wrap: wrap; 
+}
+
+.user-fields input { 
+  padding: 8px; 
+  border-radius: 6px; 
+  border: 1px solid var(--border-color); 
+  background: var(--bg-primary); 
+  color: white; 
+}
+
+/* --- ESTILOS DE BOTÕES GERAIS E AUXILIARES --- */
+.btn-small { 
+  padding: 6px 12px; 
+  background: var(--accent); 
+  border: none; 
+  color: white; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  text-decoration: none; 
+  font-size: 0.85rem; 
+}
+
+.btn-danger { 
+  background: var(--danger); 
+}
+
+.btn-link { 
+  background: none; 
+  border: none; 
+  color: var(--accent); 
+  cursor: pointer; 
+  text-decoration: underline; 
+}
+
+/* --- CARTOES E FORMULÁRIOS --- */
+.main-content { 
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 20px; 
+}
+
+.card { 
+  background: var(--bg-card); 
+  border: 1px solid var(--border-color); 
+  border-radius: 12px; 
+  padding: 20px; 
+}
+
+.card h2 { 
+  margin-bottom: 15px; 
+  font-size: 1.2rem; 
+}
+
+.form-group { 
+  margin-bottom: 15px; 
+}
+
+.form-group label { 
+  display: block; 
+  margin-bottom: 5px; 
+  color: var(--text-muted); 
+  font-size: 0.9rem; 
+}
+
+.form-group input, .form-group select { 
+  width: 100%; 
+  padding: 10px; 
+  background: var(--bg-primary); 
+  border: 1px solid var(--border-color); 
+  border-radius: 6px; 
+  color: white; 
+}
+
+/* --- ÍCONE DE CALENDÁRIO DO INPUT DATE (AUMENTADO E DESTACADO) --- */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 2px;
+  opacity: 1;
+  filter: invert(1) brightness(1.8); /* Aumenta o brilho e contraste no tema escuro */
+  transform: scale(1.3);              /* Aumenta o tamanho visual do ícone */
+  transition: transform 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  transform: scale(1.5);
+}
+
+/* --- GRADE DE HORÁRIOS DISPONÍVEIS/OCUPADOS --- */
+.slots-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+  gap: 10px; 
+}
+
+.slot-btn { 
+  padding: 10px 5px; 
+  background: var(--bg-primary); 
+  border: 1px solid var(--border-color); 
+  border-radius: 6px; 
+  color: white; 
+  cursor: pointer; 
+  text-align: center; 
+  font-size: 0.85rem; 
+}
+
+.slot-btn:hover:not(.disabled) { 
+  border-color: var(--accent); 
+  background: var(--bg-hover); 
+}
+
+.slot-btn.selected { 
+  background: var(--accent); 
+  border-color: var(--accent); 
+}
+
+.slot-btn.disabled { 
+  opacity: 0.4; 
+  cursor: not-allowed; 
+  background: #111; 
+  border-color: #222; 
+}
+
+.btn-submit { 
+  width: 100%; 
+  padding: 12px; 
+  background: var(--accent); 
+  color: white; 
+  border: none; 
+  border-radius: 6px; 
+  font-weight: bold; 
+  cursor: pointer; 
+}
+
+/* --- LISTAS E STATUS --- */
+.appointment-item { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border-bottom: 1px solid var(--border-color); 
+  padding: 10px 0; 
+}
+
+.status-message { 
+  padding: 10px; 
+  border-radius: 6px; 
+  margin-bottom: 15px; 
+  display: none; 
+}
+
+.status-message.error { 
+  background: rgba(239, 68, 68, 0.2); 
+  color: var(--danger); 
+  display: block; 
+}
+
+.status-message.success { 
+  background: rgba(34, 197, 94, 0.2); 
+  color: var(--success); 
+  display: block; 
+}
+
 .text-muted { color: var(--text-muted); }
 .text-danger { color: var(--danger); }

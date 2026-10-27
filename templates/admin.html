@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Painel de Controle - Admin</title>
+  <!-- Arquivo de Estilização Principal -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
+    
+    <!-- BARRA SUPERIOR DE NAVEGAÇÃO DO ADMIN -->
     <header class="top-bar">
       <h1>Painel de Gerenciamento</h1>
       <div>
@@ -16,7 +19,8 @@
     </header>
 
     <div class="main-content" style="grid-template-columns: 1fr 1fr;">
-      <!-- Gerenciar Agendamentos -->
+      
+      <!-- SESSÃO 1: LISTAGEM DE AGENDAMENTOS CONFIRMADOS -->
       <section class="card">
         <h2>Agendamentos Confirmados</h2>
         <div id="appointments-container">
@@ -28,8 +32,15 @@
                 <div>
                   <strong>{{ app.service }}</strong> - {{ app.price }}<br>
                   <small>📅 {{ app.date }} às {{ app.time }}</small><br>
-                  <small>👤 {{ app.client_name }} ({{ app.client_phone }})</small>
+                  <!-- Nome e Telefone do Cliente com link direto para iniciar conversa no WhatsApp -->
+                  <small>👤 {{ app.client_name }} 
+                    (<a href="https://wa.me/55{{ app.client_phone | replace('(', '') | replace(')', '') | replace('-', '') | replace(' ', '') }}" target="_blank" class="whatsapp-link">
+                      <svg class="wa-icon" viewBox="0 0 24 24" width="14" height="14" fill="#25D366"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001L2 22l5.132-1.339c1.462.798 3.111 1.218 4.875 1.218 5.508 0 9.991-4.479 9.991-9.985 0-2.667-1.038-5.174-2.928-7.064A9.927 9.927 0 0 0 12.012 2zm0 18.286c-1.503 0-2.977-.404-4.264-1.168l-.306-.181-3.167.827.845-3.085-.199-.318a8.28 8.28 0 0 1-1.272-4.377c0-4.568 3.717-8.286 8.363-8.286 2.234 0 4.334.871 5.912 2.45 1.579 1.579 2.449 3.679 2.449 5.913 0 4.569-3.717 8.287-8.361 8.287zm4.582-6.255c-.251-.126-1.488-.734-1.718-.818-.23-.084-.398-.126-.566.126-.168.251-.649.818-.796.985-.147.168-.294.188-.545.063-.251-.126-1.062-.391-2.022-1.248-.747-.666-1.252-1.489-1.399-1.74-.147-.251-.016-.387.11-.512.112-.112.251-.294.377-.44.126-.147.168-.251.251-.418.084-.168.042-.314-.021-.44-.063-.126-.566-1.363-.776-1.867-.204-.491-.413-.424-.566-.432l-.482-.008c-.168 0-.44.063-.67.314-.23.251-.88.86-.88 2.098 0 1.237.9 2.434 1.026 2.602.126.168 1.77 2.703 4.288 3.791.599.258 1.067.412 1.432.528.601.191 1.148.164 1.58.1.481-.071 1.488-.608 1.698-1.194.21-.586.21-1.089.147-1.194-.063-.105-.23-.168-.481-.294z"/></svg>
+                      {{ app.client_phone }}
+                    </a>)
+                  </small>
                 </div>
+                <!-- Botão de exclusão/cancelamento do agendamento -->
                 <button class="btn-danger btn-small" onclick="cancelApp('{{ app.id }}')">Cancelar</button>
               </div>
             {% endfor %}
@@ -37,7 +48,7 @@
         </div>
       </section>
 
-      <!-- Bloquear Horários -->
+      <!-- SESSÃO 2: BLOQUEIO / DESBLOQUEIO DE HORÁRIOS DA AGENDA -->
       <section class="card">
         <h2>Fechar / Bloquear Horário</h2>
         <div class="form-group">
@@ -53,12 +64,15 @@
     </div>
   </div>
 
+  <!-- JAVASCRIPT DO PAINEL ADMIN -->
   <script>
+    // Encerra a sessão do Administrador
     document.getElementById('btn-logout').addEventListener('click', async () => {
       await fetch('/admin/logout', { method: 'POST' });
       window.location.reload();
     });
 
+    // Função: Cancelamento de agendamento específico
     async function cancelApp(id) {
       if (!confirm('Deseja cancelar este agendamento?')) return;
 
@@ -71,6 +85,7 @@
       if (res.ok) window.location.reload();
     }
 
+    // Função: Alterna o bloqueio/liberação de um horário no sistema
     document.getElementById('btn-block').addEventListener('click', async () => {
       const date = document.getElementById('block-date').value;
       const time = document.getElementById('block-time').value;

@@ -1,13 +1,21 @@
+# ==============================================================================
+# SERVIDOR BACKEND FLASK - BARBEARIA CLASSE A
+# ==============================================================================
+
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from datetime import datetime, date, time
 
 app = Flask(__name__)
+# Chave secreta usada para criptografar as sessões do administrador
 app.secret_key = "chave_secreta_barbearia_classe_a"
 
+# ------------------------------------------------------------------------------
+# INFORMAÇÕES DO ESTABELECIMENTO (Altere aqui dados gerais, endereço e WhatsApp)
+# ------------------------------------------------------------------------------
 STORE_INFO = {
     "name": "Barbearia Classe A",
     "address": "Atendimento com Horário Agendado",
-    "phone": "(11) 99999-9999",
+    "phone": "(11) 99999-9999",  # <-- Mude aqui o WhatsApp da barbearia
     "hours": {
         "Segunda - Sexta": "09:00 - 19:00",
         "Sábado": "09:00 - 17:00",
@@ -15,6 +23,9 @@ STORE_INFO = {
     }
 }
 
+# ------------------------------------------------------------------------------
+# CATÁLOGO DE SERVIÇOS (Adicione, remova ou altere preços e durações aqui)
+# ------------------------------------------------------------------------------
 SERVICES = [
     {"id": 1, "name": "Corte de Cabelo / Estilo", "duration": "45 min", "price": "R$ 50,00"},
     {"id": 2, "name": "Barba Completa", "duration": "30 min", "price": "R$ 35,00"},
@@ -22,23 +33,34 @@ SERVICES = [
     {"id": 4, "name": "Tratamento Capilar", "duration": "45 min", "price": "R$ 60,00"}
 ]
 
-# Dados em memória
-appointments_db = []
-blocked_slots_db = []  # Armazena horários fechados manualmente pelo Admin [{'date': '2026-10-24', 'time': '10:00'}]
+# ------------------------------------------------------------------------------
+# BANCO DE DADOS EM MEMÓRIA (Estruturas de dados temporárias)
+# ------------------------------------------------------------------------------
+appointments_db = []     # Armazena agendamentos realizados pelos clientes
+blocked_slots_db = []    # Armazena horários bloqueados manualmente pelo Admin
 
-# Senha simples do Painel Admin
-ADMIN_PASSWORD = "admin"
+# ------------------------------------------------------------------------------
+# SENHA DO PAINEL ADMINISTRATIVO (Altere a senha do admin aqui)
+# ------------------------------------------------------------------------------
+ADMIN_PASSWORD = "admin" # <-- Altere aqui a senha de acesso da área admin
 
+# ------------------------------------------------------------------------------
+# ROTAS PRINCIPAIS DE NAVEGAÇÃO
+# ------------------------------------------------------------------------------
+
+# Rota pública: Página principal de agendamento do cliente
 @app.route("/")
 def index():
     return render_template("index.html", store=STORE_INFO, services=SERVICES)
 
+# Rota restrita: Painel administrativo
 @app.route("/admin")
 def admin_page():
     if not session.get("is_admin"):
         return render_template("admin_login.html")
     return render_template("admin.html", store=STORE_INFO, appointments=appointments_db, blocked_slots=blocked_slots_db)
 
+# Rota API: Autenticação do Administrador
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
     data = request.json or {}
@@ -47,11 +69,17 @@ def admin_login():
         return jsonify({"success": True})
     return jsonify({"success": False, "error": "Senha incorreta"}), 401
 
+# Rota API: Encerrar sessão do Administrador
 @app.route("/admin/logout", methods=["POST"])
 def admin_logout():
     session.pop("is_admin", None)
     return jsonify({"success": True})
 
+# ------------------------------------------------------------------------------
+# REGRAS DE NEGÓCIO E GERENCIAMENTO DE HORÁRIOS
+# ------------------------------------------------------------------------------
+
+# API: Retorna os horários válidos e disponíveis para uma data selecionada
 @app.route("/api/slots", methods=["GET"])
 def get_slots():
     date_str = request.args.get("date")
@@ -66,13 +94,16 @@ def get_slots():
     today = date.today()
     now_time = datetime.now().time()
 
-    weekday = selected_date.weekday() # 0: Seg ... 6: Dom
+    weekday = selected_date.weekday() # 0: Seg, 5: Sáb, 6: Dom
+    
+    # Validação: Domingo fechado
     if weekday == 6:
         return jsonify({"slots": [], "status": "closed", "message": "Fechado aos domingos"})
 
+    # Definição dos horários de atendimento
     start_hour, end_hour = (9, 17) if weekday == 5 else (9, 19)
 
-    # Buscar horários já reservados ou bloqueados
+    # Identifica horários já ocupados ou bloqueados pelo admin
     booked_times = [a["time"] for a in appointments_db if a["date"] == date_str]
     blocked_times = [b["time"] for b in blocked_slots_db if b["date"] == date_str]
 
@@ -85,19 +116,19 @@ def get_slots():
             is_available = True
             reason = "disponivel"
 
-            # 1. Regra: Se a data for HOJE e o horário já passou
+            # 1. Regra: Bloqueia horários passados se a data for HOJE
             if selected_date == today and slot_time_obj <= now_time:
                 is_available = False
                 reason = "passado"
-            # 2. Regra: Se a data já for do passado
+            # 2. Regra: Bloqueia qualquer data anterior a hoje
             elif selected_date < today:
                 is_available = False
                 reason = "passado"
-            # 3. Regra: Se já está agendado
+            # 3. Regra: Bloqueia horários já agendados
             elif slot_time_str in booked_times:
                 is_available = False
                 reason = "reservado"
-            # 4. Regra: Se foi bloqueado pelo Admin
+            # 4. Regra: Bloqueia horários fechados manualmente pelo admin
             elif slot_time_str in blocked_times:
                 is_available = False
                 reason = "bloqueado"
@@ -110,6 +141,7 @@ def get_slots():
 
     return jsonify({"slots": slots, "status": "open"})
 
+# API: Realiza o agendamento do cliente
 @app.route("/api/book", methods=["POST"])
 def book_appointment():
     data = request.json or {}
@@ -121,12 +153,12 @@ def book_appointment():
     date_str = data["date"]
     time_str = data["time"]
 
-    # Validar se o horário já passou
+    # Validação de segurança no backend para horários expirados
     selected_dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
     if selected_dt <= datetime.now():
         return jsonify({"success": False, "error": "Este horário já passou. Escolha um horário futuro."}), 400
 
-    # Validar se já está ocupado ou bloqueado
+    # Validação de conflito de horários
     if any(a["date"] == date_str and a["time"] == time_str for a in appointments_db):
         return jsonify({"success": False, "error": "Este horário já foi agendado por outro cliente."}), 400
 
@@ -150,7 +182,11 @@ def book_appointment():
     appointments_db.append(new_app)
     return jsonify({"success": True, "appointment": new_app})
 
-# ROTA ADMIN: Cancelar/Remover Agendamento
+# ------------------------------------------------------------------------------
+# ROTAS EXCLUSIVAS DO ADMINISTRADOR
+# ------------------------------------------------------------------------------
+
+# API Admin: Cancelar agendamento de um cliente
 @app.route("/admin/cancel", methods=["POST"])
 def admin_cancel():
     if not session.get("is_admin"):
@@ -161,7 +197,7 @@ def admin_cancel():
     appointments_db = [a for a in appointments_db if str(a["id"]) != str(app_id)]
     return jsonify({"success": True})
 
-# ROTA ADMIN: Bloquear/Desbloquear Horário
+# API Admin: Bloquear ou reabrir horários manualmente
 @app.route("/admin/toggle-block", methods=["POST"])
 def admin_toggle_block():
     if not session.get("is_admin"):

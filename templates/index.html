@@ -4,38 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ store.name }} - Agendamento</title>
+  <!-- Arquivo de Estilização Principal -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
+    
+    <!-- CABEÇALHO DO SITE COM LINK DO WHATSAPP E BOTAO ADMIN -->
     <header>
       <div class="top-bar">
         <h1>{{ store.name }}</h1>
-        <a href="/admin" class="btn-admin-link">Área Admin 🔒</a>
+        <!-- Botão Visual de Acesso ao Painel do Administrador -->
+        <a href="/admin" class="btn-admin">
+          🔒 Área Admin
+        </a>
       </div>
-      <p>{{ store.address }} | {{ store.phone }}</p>
+      <p>
+        {{ store.address }} | 
+        <!-- Link Clicável e Formatado que abre a conversa diretamente no WhatsApp -->
+        <a href="https://wa.me/55{{ store.phone | replace('(', '') | replace(')', '') | replace('-', '') | replace(' ', '') }}" target="_blank" class="whatsapp-link">
+          <svg class="wa-icon" viewBox="0 0 24 24" width="18" height="18" fill="#25D366"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001L2 22l5.132-1.339c1.462.798 3.111 1.218 4.875 1.218 5.508 0 9.991-4.479 9.991-9.985 0-2.667-1.038-5.174-2.928-7.064A9.927 9.927 0 0 0 12.012 2zm0 18.286c-1.503 0-2.977-.404-4.264-1.168l-.306-.181-3.167.827.845-3.085-.199-.318a8.28 8.28 0 0 1-1.272-4.377c0-4.568 3.717-8.286 8.363-8.286 2.234 0 4.334.871 5.912 2.45 1.579 1.579 2.449 3.679 2.449 5.913 0 4.569-3.717 8.287-8.361 8.287zm4.582-6.255c-.251-.126-1.488-.734-1.718-.818-.23-.084-.398-.126-.566.126-.168.251-.649.818-.796.985-.147.168-.294.188-.545.063-.251-.126-1.062-.391-2.022-1.248-.747-.666-1.252-1.489-1.399-1.74-.147-.251-.016-.387.11-.512.112-.112.251-.294.377-.44.126-.147.168-.251.251-.418.084-.168.042-.314-.021-.44-.063-.126-.566-1.363-.776-1.867-.204-.491-.413-.424-.566-.432l-.482-.008c-.168 0-.44.063-.67.314-.23.251-.88.86-.88 2.098 0 1.237.9 2.434 1.026 2.602.126.168 1.77 2.703 4.288 3.791.599.258 1.067.412 1.432.528.601.191 1.148.164 1.58.1.481-.071 1.488-.608 1.698-1.194.21-.586.21-1.089.147-1.194-.063-.105-.23-.168-.481-.294z"/></svg>
+          {{ store.phone }}
+        </a>
+      </p>
     </header>
 
-    <!-- Modal/Sessão de Identificação do Cliente -->
+    <!-- SESSÃO DE LOGIN E SALVAMENTO AUTOMÁTICO DO CLIENTE -->
     <div id="user-bar" class="card user-bar">
+      <!-- Formulário para o cliente preencher na primeira visita -->
       <div id="login-fields" class="user-fields">
         <span>👋 <strong>Faça seu acesso rápido:</strong></span>
         <input type="text" id="user-name-input" placeholder="Seu Nome Completo">
         <input type="tel" id="user-phone-input" placeholder="Seu WhatsApp">
         <button id="btn-save-user" class="btn-small">Entrar</button>
       </div>
+      <!-- Exibição dos dados salvos no navegador (localStorage) -->
       <div id="logged-fields" class="user-fields" style="display: none;">
         <span>✅ Conectado como: <strong id="logged-name"></strong> (<span id="logged-phone"></span>)</span>
         <button id="btn-change-user" class="btn-link">Alterar dados</button>
       </div>
     </div>
 
+    <!-- PAINEL DE FORMULÁRIO DE AGENDAMENTO -->
     <div class="main-content">
       <section class="card">
         <h2>Agendar Horário</h2>
+        <!-- Caixa de alertas de sucesso ou erro -->
         <div id="status-msg" class="status-message"></div>
 
         <form id="booking-form">
+          <!-- Seleção de Serviço -->
           <div class="form-group">
             <label for="service">Serviço</label>
             <select id="service" required>
@@ -46,11 +64,13 @@
             </select>
           </div>
 
+          <!-- Seleção de Data -->
           <div class="form-group">
             <label for="date">Data do Agendamento</label>
             <input type="date" id="date" required>
           </div>
 
+          <!-- Grade Dinâmica de Horários -->
           <div class="form-group">
             <label>Horários Disponíveis para esta Data</label>
             <div id="slots-container" class="slots-grid">
@@ -64,10 +84,11 @@
     </div>
   </div>
 
+  <!-- SCRIPT FRONTEND JS (Interatividade, localStorage e chamadas de API) -->
   <script>
     let selectedTimeSlot = null;
 
-    // Login do usuário no navegador (localStorage)
+    // Referências dos elementos do DOM
     const nameInput = document.getElementById('user-name-input');
     const phoneInput = document.getElementById('user-phone-input');
     const btnSaveUser = document.getElementById('btn-save-user');
@@ -77,6 +98,7 @@
     const loggedName = document.getElementById('logged-name');
     const loggedPhone = document.getElementById('logged-phone');
 
+    // Função: Verifica se o cliente já possui dados salvos no navegador
     function checkUserLogin() {
       const name = localStorage.getItem('client_name');
       const phone = localStorage.getItem('client_phone');
@@ -92,6 +114,7 @@
       }
     }
 
+    // Salva o nome e telefone do cliente no localStorage
     btnSaveUser.addEventListener('click', () => {
       const name = nameInput.value.trim();
       const phone = phoneInput.value.trim();
@@ -104,6 +127,7 @@
       checkUserLogin();
     });
 
+    // Permite ao cliente alterar seus dados cadastrados
     btnChangeUser.addEventListener('click', () => {
       localStorage.removeItem('client_name');
       localStorage.removeItem('client_phone');
@@ -112,16 +136,18 @@
 
     checkUserLogin();
 
-    // Data mínima hoje
+    // Configuração do input de data
     const dateInput = document.getElementById('date');
     const slotsContainer = document.getElementById('slots-container');
     const bookingForm = document.getElementById('booking-form');
     const statusMsg = document.getElementById('status-msg');
 
+    // Define a data mínima para hoje
     dateInput.min = new Date().toISOString().split('T')[0];
 
     dateInput.addEventListener('change', fetchSlots);
 
+    // Função: Consulta e renderiza os horários disponíveis da API
     async function fetchSlots() {
       const selectedDate = dateInput.value;
       if (!selectedDate) return;
@@ -152,6 +178,7 @@
           let statusText = slot.time;
           let btnClass = 'slot-btn';
 
+          // Trata os horários desativados por regra de negócio
           if (!slot.available) {
             btnClass += ' disabled';
             if (slot.reason === 'passado') statusText += ' (Expirado)';
@@ -177,6 +204,7 @@
       }
     }
 
+    // Função: Envio e validação do formulário de agendamento
     bookingForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -213,7 +241,7 @@
         if (response.ok && result.success) {
           showStatus('Agendamento realizado com sucesso!', 'success');
           selectedTimeSlot = null;
-          fetchSlots(); // Atualiza a lista e remove o horário agendado!
+          fetchSlots(); // Atualiza a lista e oculta/desativa o horário recém-agendado
         } else {
           showStatus(result.error || 'Erro ao realizar agendamento.', 'error');
         }
